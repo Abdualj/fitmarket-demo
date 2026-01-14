@@ -3,1145 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitConnect Helsinki - Find Your Perfect Personal Trainer</title>
+    <title>FitConnect - Personal Trainer App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --secondary: #8b5cf6;
-            --accent: #f59e0b;
-            --light: #f8fafc;
-            --dark: #1e293b;
-            --gray: #64748b;
-            --success: #10b981;
-        }
-
-        body {
-            background-color: #f1f5f9;
-            color: var(--dark);
-            line-height: 1.6;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header Styles */
-        header {
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .logo i {
-            color: var(--accent);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--dark);
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .auth-buttons {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .btn {
-            padding: 0.5rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-            font-size: 0.9rem;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-outline:hover {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 5rem 0;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
-            background-size: cover;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-            position: relative;
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            max-width: 600px;
-            margin: 0 auto 2rem;
-            opacity: 0.9;
-            position: relative;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-            position: relative;
-        }
-
-        .hero-buttons .btn {
-            padding: 0.75rem 2rem;
-            font-size: 1rem;
-        }
-
-        .btn-secondary {
-            background-color: white;
-            color: var(--primary);
-        }
-
-        .btn-secondary:hover {
-            background-color: #f1f5f9;
-        }
-
-        /* Features Section */
-        .features {
-            padding: 5rem 0;
-            background-color: var(--light);
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .section-title h2 {
-            font-size: 2.5rem;
-            color: var(--dark);
-            margin-bottom: 1rem;
-        }
-
-        .section-title p {
-            font-size: 1.1rem;
-            color: var(--gray);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .feature-card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 2rem;
-            color: white;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--dark);
-        }
-
-        .feature-card p {
-            color: var(--gray);
-        }
-
-        /* Trainers Section */
-        .trainers {
-            padding: 5rem 0;
-        }
-
-        .trainers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .trainer-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .trainer-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .trainer-image {
-            height: 200px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3rem;
-        }
-
-        .trainer-info {
-            padding: 1.5rem;
-        }
-
-        .trainer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .trainer-name {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .trainer-location {
-            color: var(--gray);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .trainer-rating {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .trainer-specialties {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .specialty-tag {
-            background-color: #dbeafe;
-            color: var(--primary);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .trainer-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1rem;
-        }
-
-        .trainer-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--success);
-        }
-
-        .price-label {
-            font-size: 0.8rem;
-            color: var(--gray);
-            display: block;
-        }
-
-        /* Map Section */
-        .map-section {
-            padding: 5rem 0;
-            background-color: var(--light);
-        }
-
-        .map-container {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 2rem;
-            height: 500px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        #trainers-map {
-            height: 100%;
-            width: 100%;
-            border-radius: 8px;
-        }
-
-        .map-sidebar {
-            background: white;
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
-        .map-sidebar h3 {
-            margin-bottom: 1.5rem;
-            color: var(--dark);
-            font-size: 1.5rem;
-        }
-
-        .trainer-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .trainer-map-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            border: 1px solid #e2e8f0;
-        }
-
-        .trainer-map-item:hover {
-            background-color: #f1f5f9;
-        }
-
-        .trainer-map-item.active {
-            background-color: #dbeafe;
-            border-color: var(--primary);
-        }
-
-        .trainer-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .trainer-map-info {
-            flex: 1;
-        }
-
-        .trainer-map-name {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .trainer-map-location {
-            font-size: 0.9rem;
-            color: var(--gray);
-            margin-bottom: 0.25rem;
-        }
-
-        .trainer-map-specialty {
-            font-size: 0.8rem;
-            color: var(--primary);
-            background-color: #dbeafe;
-            padding: 0.2rem 0.5rem;
-            border-radius: 12px;
-            display: inline-block;
-        }
-
-        /* How It Works Section */
-        .how-it-works {
-            padding: 5rem 0;
-            background-color: white;
-        }
-
-        .steps {
-            display: flex;
-            justify-content: space-between;
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .steps::before {
-            content: '';
-            position: absolute;
-            top: 40px;
-            left: 10%;
-            right: 10%;
-            height: 3px;
-            background-color: var(--primary);
-            z-index: 1;
-        }
-
-        .step {
-            text-align: center;
-            position: relative;
-            z-index: 2;
-            flex: 1;
-        }
-
-        .step-number {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border: 3px solid var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 0 auto 1.5rem;
-        }
-
-        .step h3 {
-            margin-bottom: 0.5rem;
-            color: var(--dark);
-        }
-
-        .step p {
-            color: var(--gray);
-            max-width: 250px;
-            margin: 0 auto;
-        }
-
-        /* CTA Section */
-        .cta {
-            padding: 5rem 0;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            text-align: center;
-        }
-
-        .cta h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .cta p {
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto 2rem;
-            opacity: 0.9;
-        }
-
-        /* Footer */
-        footer {
-            background-color: var(--dark);
-            color: white;
-            padding: 3rem 0 1.5rem;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .footer-column h3 {
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-            padding-bottom: 0.5rem;
-        }
-
-        .footer-column h3::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 40px;
-            height: 3px;
-            background-color: var(--primary);
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.75rem;
-        }
-
-        .footer-links a {
-            color: #cbd5e1;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: white;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background-color: #334155;
-            border-radius: 50%;
-            color: white;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-
-        .social-links a:hover {
-            background-color: var(--primary);
-        }
-
-        .copyright {
-            text-align: center;
-            padding-top: 1.5rem;
-            border-top: 1px solid #334155;
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-            }
-
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .steps {
-                flex-direction: column;
-                gap: 2rem;
-            }
-
-            .steps::before {
-                display: none;
-            }
-
-            .map-container {
-                grid-template-columns: 1fr;
-                height: auto;
-            }
-
-            #trainers-map {
-                height: 400px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <nav class="navbar">
-                <div class="logo">
-                    <i class="fas fa-dumbbell"></i>
-                    <span>FitConnect Helsinki</span>
-                </div>
-                <div class="nav-links">
-                    <a href="#">Koti</a>
-                    <a href="#">Löydä Valmentaja</a>
-                    <a href="#">Miten Se Toimii</a>
-                    <a href="#">Hinnasto</a>
-                    <a href="#">Tietoa Meistä</a>
-                </div>
-                <div class="auth-buttons">
-                    <button class="btn btn-outline">Kirjaudu</button>
-                    <button class="btn btn-primary">Rekisteröidy</button>
-                </div>
-            </nav>
+    <!-- Demo Badge -->
+    <div class="demo-badge">LIVE DEMO</div>
+
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <div class="app-title" id="current-screen">FitConnect</div>
+            <div class="header-actions">
+                <i class="fas fa-bell" id="notification-bell"></i>
+            </div>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1>Muunna <span style="color: var(--accent);">Kuntosi</span> Matka</h1>
-            <p>Yhdistä sertifioituihin henkilökohtaisiin valmentajiin ja saavuta kuntotavoitteesi Helsingissä</p>
-            <div class="hero-buttons">
-                <button class="btn btn-secondary">Löydä Valmentaja</button>
-                <button class="btn btn-outline" style="border-color: white; color: white;">Olen Valmentaja</button>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Home Screen -->
+        <section id="home-screen" class="app-section active">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Etsi valmentajia, erikoisaloja..." id="search-input">
+            </div>
+
+            <h2 style="margin: 1rem 0; font-size: 1.5rem;">Tervetuloa takaisin!</h2>
+            
+            <!-- Progress Tracking -->
+            <div class="progress-card">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Oma edistymisesi</span>
+                    <span style="font-weight: bold; color: var(--primary);">65%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 65%"></div>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--gray); text-align: center;"></div>
+                    Olet suorittanut 6/10 tavoitteistasi
+                </div>
+            </div>
+            
+            <!-- Live Booking Counter -->
+            <div class="live-booking-counter">
+                <div style="font-size: 0.9rem;">Varauksia tänään Helsingissä</div>
+                <div style="font-size: 1.5rem; font-weight: bold;" id="booking-counter">24</div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                <div class="btn btn-outline" onclick="showSection('trainers-screen')">
+                    <i class="fas fa-dumbbell"></i>
+                    Etsi Valmentaja
+                </div>
+                <div class="btn btn-outline" onclick="showSection('bookings-screen')">
+                    <i class="fas fa-calendar"></i>
+                    Omat Varaukset
+                </div>
+            </div>
+
+            <!-- Featured Trainers -->
+            <h3 style="margin: 1.5rem 0 1rem 0;">Suositellut valmentajat</h3>
+            <div class="trainers-grid" id="featured-trainers">
+                <!-- Featured trainers will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Trainers Screen -->
+        <section id="trainers-screen" class="app-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>Valmentajat</h2>
+                <div class="btn btn-outline" onclick="openFilterModal()">
+                    <i class="fas fa-filter"></i>
+                    Suodata
+                </div>
+            </div>
+
+            <div class="trainers-grid" id="all-trainers">
+                <!-- All trainers will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Bookings Screen -->
+        <section id="bookings-screen" class="app-section">
+            <h2 style="margin-bottom: 1rem;">Omat Varaukset</h2>
+            <div id="bookings-list">
+                <!-- Bookings will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Profile Screen -->
+        <section id="profile-screen" class="app-section">
+            <h2 style="margin-bottom: 1rem;">Profiili</h2>
+            <div style="text-align: center; padding: 2rem;">
+                <div style="width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; margin: 0 auto 1rem;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3>Demo Käyttäjä</h3>
+                <p style="color: var(--gray); margin-bottom: 2rem;">asiakas@example.com</p>
+                
+                <div class="btn btn-outline btn-block" onclick="openLoginModal()">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Vaihda Käyttäjää
+                </div>
+                
+                <div class="btn btn-primary btn-block" style="margin-top: 1rem;" onclick="openOnboardingModal()">
+                    <i class="fas fa-redo"></i>
+                    Käynnistä Demo Uudelleen
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="showSection('home-screen')">
+            <i class="fas fa-home nav-icon"></i>
+            <span>Koti</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showSection('trainers-screen')">
+            <i class="fas fa-dumbbell nav-icon"></i>
+            <span>Valmentajat</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showSection('bookings-screen')">
+            <i class="fas fa-calendar nav-icon"></i>
+            <span>Varaukset</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showSection('profile-screen')">
+            <i class="fas fa-user nav-icon"></i>
+            <span>Profiili</span>
+        </a>
+    </nav>
+
+    <!-- Modals -->
+    <!-- Trainer Profile Modal -->
+    <div id="trainer-profile-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="trainer-modal-name">Valmentajan Profiili</h2>
+                <button class="modal-close" onclick="closeModal('trainer-profile-modal')">×</button>
+            </div>
+            <div id="trainer-modal-content">
+                <!-- Content loaded dynamically -->
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Features Section -->
-    <section class="features">
-        <div class="container">
-            <div class="section-title">
-                <h2>Miksi Valita FitConnect?</h2>
-                <p>Teemme laadukkaiden henkilökohtaisten valmentajien löytämisen ja varaamisen helpoksi</p>
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Varaa Aika</h2>
+                <button class="modal-close" onclick="closeModal('booking-modal')">×</button>
             </div>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-user-check"></i>
-                    </div>
-                    <h3>Sertifioidut Ammattilaiset</h3>
-                    <p>Kaikki valmentajamme on tarkistettu ja sertifioitu todistettavalla osaamisella</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </div>
-                    <h3>Joustava Aikataulutus</h3>
-                    <p>Varaa sessioita, jotka sopivat aikatauluusi reaaliaikaisella saatavuudella</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <h3>Läpinäkyvä Hinnoittelu</h3>
-                    <p>Ei piilokuluja. Näe valmentajien hinnat etukäteen ja valitse budjettisi mukaan</p>
-                </div>
+            <div id="booking-modal-content">
+                <!-- Booking form loaded dynamically -->
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Featured Trainers Section -->
-    <section class="trainers">
-        <div class="container">
-            <div class="section-title">
-                <h2>Esitellyt Valmentajat</h2>
-                <p>Tutustu huippuarvosteltuihin ammattivalmentajiimme Helsingissä</p>
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Kirjaudu Sisään</h2>
+                <button class="modal-close" onclick="closeModal('login-modal')">×</button>
             </div>
-            <div class="trainers-grid">
-                <!-- Trainer 1 -->
-                <div class="trainer-card">
-                    <div class="trainer-image">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="trainer-info">
-                        <div class="trainer-header">
-                            <div>
-                                <div class="trainer-name">Mika Virtanen</div>
-                                <div class="trainer-location">Kallio, Helsinki</div>
-                            </div>
-                            <div class="trainer-rating">
-                                <i class="fas fa-star"></i>
-                                <span>4.9</span>
-                                <span class="trainer-review-count">(87)</span>
-                            </div>
-                        </div>
-                        <div class="trainer-specialties">
-                            <span class="specialty-tag">Voimaharjoittelu</span>
-                            <span class="specialty-tag">Kehonrakennus</span>
-                            <span class="specialty-tag">ravitsemus</span>
-                        </div>
-                        <div class="trainer-footer">
-                            <div>
-                                <span class="trainer-price">65€</span>
-                                <span class="price-label">per tunti</span>
-                            </div>
-                            <button class="btn btn-primary">Näytä Profiili</button>
-                        </div>
-                    </div>
+            <div style="text-align: center; padding: 1rem 0;">
+                <h3>Demo Tilat</h3>
+                <p style="color: var(--gray); margin-bottom: 1rem;">Valitse demo käyttäjärooli</p>
+                
+                <div class="btn btn-primary btn-block" style="margin-bottom: 0.5rem;" onclick="loginAsCustomer()">
+                    <i class="fas fa-user"></i>
+                    Kirjaudu Asiakkaana
                 </div>
-
-                <!-- Trainer 2 -->
-                <div class="trainer-card">
-                    <div class="trainer-image">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="trainer-info">
-                        <div class="trainer-header">
-                            <div>
-                                <div class="trainer-name">Emma Korhonen</div>
-                                <div class="trainer-location">Eira, Helsinki</div>
-                            </div>
-                            <div class="trainer-rating">
-                                <i class="fas fa-star"></i>
-                                <span>4.8</span>
-                                <span class="trainer-review-count">(64)</span>
-                            </div>
-                        </div>
-                        <div class="trainer-specialties">
-                            <span class="specialty-tag">Jooga</span>
-                            <span class="specialty-tag">Meditaatio</span>
-                            <span class="specialty-tag">Venyttely</span>
-                        </div>
-                        <div class="trainer-footer">
-                            <div>
-                                <span class="trainer-price">55€</span>
-                                <span class="price-label">per tunti</span>
-                            </div>
-                            <button class="btn btn-primary">Näytä Profiili</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Trainer 3 -->
-                <div class="trainer-card">
-                    <div class="trainer-image">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="trainer-info">
-                        <div class="trainer-header">
-                            <div>
-                                <div class="trainer-name">Jussi Nieminen</div>
-                                <div class="trainer-location">Punavuori, Helsinki</div>
-                            </div>
-                            <div class="trainer-rating">
-                                <i class="fas fa-star"></i>
-                                <span>4.9</span>
-                                <span class="trainer-review-count">(92)</span>
-                            </div>
-                        </div>
-                        <div class="trainer-specialties">
-                            <span class="specialty-tag">Kestävyys</span>
-                            <span class="specialty-tag">Juoksu</span>
-                            <span class="specialty-tag">Polkupyöräily</span>
-                        </div>
-                        <div class="trainer-footer">
-                            <div>
-                                <span class="trainer-price">60€</span>
-                                <span class="price-label">per tunti</span>
-                            </div>
-                            <button class="btn btn-primary">Näytä Profiili</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div style="text-align: center; margin-top: 3rem;">
-                <button class="btn btn-primary" style="padding: 0.75rem 2rem;">Näytä Kaikki Valmentajat</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Map Section -->
-    <section class="map-section">
-        <div class="container">
-            <div class="section-title">
-                <h2>Löydä Valmentajia Läheltäsi</h2>
-                <p>Selaa valmentajien verkostoamme Helsingin alueella</p>
-            </div>
-            <div class="map-container">
-                <div id="trainers-map"></div>
-                <div class="map-sidebar">
-                    <h3>Saatavilla Olevat Valmentajat</h3>
-                    <div class="trainer-list" id="trainer-list">
-                        <!-- Trainer list will be populated by JavaScript -->
-                    </div>
+                <div class="btn btn-outline btn-block" onclick="loginAsTrainer()">
+                    <i class="fas fa-dumbbell"></i>
+                    Kirjaudu Valmentajana
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- How It Works Section -->
-    <section class="how-it-works">
-        <div class="container">
-            <div class="section-title">
-                <h2>Miten Se Toimii</h2>
-                <p>Aloittaminen FitConnectin kanssa on yksinkertaista ja suoraviivaista</p>
-            </div>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3>Löydä Valmentajasi</h3>
-                    <p>Selaa profiileja, lue arvosteluja ja löydä täydellinen valmentaja tavoillesi</p>
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <div style="text-align: center; padding: 2rem;">
+                <div style="width: 80px; height: 80px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; margin: 0 auto 1rem;">
+                    <i class="fas fa-check"></i>
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3>Varaa Sessio</h3>
-                    <p>Valitse haluamasi aika ja sessiotyyppi, ja varaa välittömästi</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3>Aloita Harjoittelu</h3>
-                    <p>Tapa valmentajasi ja aloita kuntoilusi muutosmatka</p>
-                </div>
+                <h3 id="success-title">Onnistui!</h3>
+                <p id="success-message" style="color: var(--gray); margin-bottom: 2rem;"></p>
+                <button class="btn btn-primary btn-block" onclick="closeModal('success-modal')">
+                    Selvä
+                </button>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- CTA Section -->
-    <section class="cta">
-        <div class="container">
-            <h2>Valmis Aloittamaan Kuntosi Matkan?</h2>
-            <p>Liity tuhansiin asiakkaihin, jotka ovat muuttaneet elämäänsä FitConnectin avulla</p>
-            <div class="hero-buttons">
-                <button class="btn btn-secondary">Löydä Valmentajasi Tänään</button>
-                <button class="btn btn-outline" style="border-color: white; color: white;">Lue Lisää</button>
+    <!-- Onboarding Modal -->
+    <div id="onboarding-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tervetuloa FitConnectiin!</h2>
+                <button class="modal-close" onclick="closeModal('onboarding-modal')">×</button>
+            </div>
+            <div id="onboarding-content" style="text-align: center;">
+                <!-- Onboarding steps loaded dynamically -->
             </div>
         </div>
-    </section>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal">
+        <div class="modal-content">
+            <div style="text-align: center; padding: 2rem;">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 id="error-modal-title">Virhe</h3>
+                <p id="error-modal-message" style="color: var(--gray); margin-bottom: 2rem;"></p>
+                <button class="btn btn-primary btn-block" onclick="closeModal('error-modal')">
+                    Yritä uudelleen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div id="filter-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Suodattimet</h2>
+                <button class="modal-close" onclick="closeModal('filter-modal')" aria-label="Sulje suodattimet">×</button>
+            </div>
+            <div id="filter-modal-content" style="padding: 1rem;">
+                <!-- Filter options loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Action Floating Button -->
+    <button class="quick-action-btn" onclick="showSection('trainers-screen')" aria-label="Etsi valmentajia">
+        <i class="fas fa-search"></i>
+    </button>
 
     <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>FitConnect Helsinki</h3>
-                    <p style="color: #cbd5e1; margin-bottom: 1.5rem;">Yhdistämme asiakkaita sertifioituihin henkilökohtaisiin valmentajiin muuttavissa kuntoilukokemuksissa.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-                <div class="footer-column">
-                    <h3>Pikalinkit</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Koti</a></li>
-                        <li><a href="#">Löydä Valmentaja</a></li>
-                        <li><a href="#">Ryhdy Valmentajaksi</a></li>
-                        <li><a href="#">Hinnasto</a></li>
-                        <li><a href="#">Blogi</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Tuki</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Ohjekeskus</a></li>
-                        <li><a href="#">Ota Yhteyttä</a></li>
-                        <li><a href="#">UKK</a></li>
-                        <li><a href="#">Tietosuojakäytäntö</a></li>
-                        <li><a href="#">Käyttöehdot</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Yhteystiedot</h3>
-                    <ul class="footer-links">
-                        <li><i class="fas fa-envelope" style="margin-right: 0.5rem;"></i> tervetuloa@fitconnect.fi</li>
-                        <li><i class="fas fa-phone" style="margin-right: 0.5rem;"></i> +358 40 123 4567</li>
-                        <li><i class="fas fa-map-marker-alt" style="margin-right: 0.5rem;"></i> Kuntokatu 15, 00100 Helsinki</li>
-                    </ul>
-                </div>
+    <footer class="app-footer">
+        <div class="footer-section">
+            <h4>FitConnect</h4>
+            <p style="color: var(--gray); font-size: 0.85rem; line-height: 1.6;">
+                Suomen johtava personal trainer -varauspalvelu. Löydä itsellesi sopiva valmentaja ja saavuta tavoitteesi.
+            </p>
+            <div class="footer-social">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
             </div>
-            <div class="copyright">
-                <p>&copy; 2023 FitConnect Helsinki. Kaikki oikeudet pidätetään.</p>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Tietoja</h4>
+            <div class="footer-links">
+                <a href="#" onclick="event.preventDefault(); showSuccess('Tietoa meistä', 'FitConnect on perustettu 2024 yhdistämään valmentajat ja asiakkaat helposti ja turvallisesti.')">Tietoa meistä</a>
+                <a href="#" onclick="event.preventDefault(); showSuccess('Miten se toimii', 'Selaa valmentajia, valitse itsellesi sopiva, varaa aika ja aloita treenit. Näin helppoa!')">Miten se toimii</a>
+                <a href="#" onclick="event.preventDefault(); showSuccess('Valmentajat', 'Liity FitConnectiin valmentajana ja tavoita uusia asiakkaita!')">Liity valmentajaksi</a>
+                <a href="#" onclick="event.preventDefault(); showSuccess('Blogi', 'Terveyttä ja kuntoa käsittelevät artikkelit ja vinkit tulossa pian!')">Blogi</a>
             </div>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Tuki</h4>
+            <div class="footer-links">
+                <a href="#" onclick="event.preventDefault(); showSuccess('Yhteystiedot', 'Sähköposti: info@fitconnect.fi\nPuhelin: +358 40 123 4567\nOsoite: Mannerheimintie 1, 00100 Helsinki')">Ota yhteyttä</a>
+                <a href="#" onclick="event.preventDefault(); showSuccess('UKK', 'Usein kysytyt kysymykset ja vastaukset löydät pian täältä!')">UKK</a>
+                <a href="#" onclick="event.preventDefault(); showSuccess('Tuki', 'Tarvitsetko apua? Ota yhteyttä asiakaspalveluumme ma-pe 9-17.')">Asiakaspalvelu</a>
+            </div>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Juridiset</h4>
+            <div class="footer-links">
+                <a href="#" onclick="event.preventDefault(); showSuccess('Käyttöehdot', 'Tämä on demo-versio. Käyttöehdot tulisivat tähän tuotantoversiossa.')">Käyttöehdot</a>
+                <a href="#" onclick="event.preventDefault(); showSuccess('Tietosuoja', 'Pidämme tietosuojasi tärkeänä. Tietosuojaseloste tulossa.')">Tietosuojaseloste</a>
+                <a href="#" onclick="event.preventDefault(); showSuccess('Evästeet', 'Evästekäytännöt ja hallinta.')">Evästekäytäntö</a>
+            </div>
+        </div>
+        
+        <div class="footer-copyright">
+            © 2026 FitConnect. Kaikki oikeudet pidätetään. | Demo-versio
         </div>
     </footer>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        // Trainer data with coordinates in Helsinki
-        const trainers = [
-            {
-                id: 1,
-                name: "Mika Virtanen",
-                location: "Kallio, Helsinki",
-                specialty: "Voimaharjoittelu & Kehonrakennus",
-                rate: 65,
-                rating: 4.9,
-                coordinates: [60.1843, 24.9503],
-                initials: "MV"
-            },
-            {
-                id: 2,
-                name: "Emma Korhonen",
-                location: "Eira, Helsinki",
-                specialty: "Jooga & Meditaatio",
-                rate: 55,
-                rating: 4.8,
-                coordinates: [60.1578, 24.9349],
-                initials: "EK"
-            },
-            {
-                id: 3,
-                name: "Jussi Nieminen",
-                location: "Punavuori, Helsinki",
-                specialty: "Kestävyys & Juoksu",
-                rate: 60,
-                rating: 4.9,
-                coordinates: [60.1626, 24.9326],
-                initials: "JN"
-            },
-            {
-                id: 4,
-                name: "Sofia Mäkinen",
-                location: "Töölö, Helsinki",
-                specialty: "Pilates & Sydänlysä",
-                rate: 58,
-                rating: 4.7,
-                coordinates: [60.1828, 24.9207],
-                initials: "SM"
-            },
-            {
-                id: 5,
-                name: "Antti Lahtinen",
-                location: "Kamppi, Helsinki",
-                specialty: "CrossFit & Funktionaalisuus",
-                rate: 70,
-                rating: 4.8,
-                coordinates: [60.1690, 24.9318],
-                initials: "AL"
-            },
-            {
-                id: 6,
-                name: "Laura Järvinen",
-                location: "Käpylä, Helsinki",
-                specialty: "Senioriliikunta & Tasapaino",
-                rate: 50,
-                rating: 4.6,
-                coordinates: [60.2155, 24.9495],
-                initials: "LJ"
-            },
-            {
-                id: 7,
-                name: "Timo Koskinen",
-                location: "Herttoniemi, Helsinki",
-                specialty: "Uinti & Vesiliikunta",
-                rate: 62,
-                rating: 4.7,
-                coordinates: [60.1984, 25.0313],
-                initials: "TK"
-            },
-            {
-                id: 8,
-                name: "Jenna Lehtonen",
-                location: "Vuosaari, Helsinki",
-                specialty: "Tanssi & Liikkuvuus",
-                rate: 53,
-                rating: 4.9,
-                coordinates: [60.2096, 25.1419],
-                initials: "JL"
-            }
-        ];
-
-        // Initialize the map
-        function initMap() {
-            // Create map centered on Helsinki
-            const map = L.map('trainers-map').setView([60.1699, 24.9384], 12);
-
-            // Add tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            // Create custom icon
-            const trainerIcon = L.divIcon({
-                className: 'trainer-marker',
-                html: '<div style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🏃</div>',
-                iconSize: [40, 40],
-                iconAnchor: [20, 20]
-            });
-
-            // Add markers for each trainer
-            const markers = [];
-            trainers.forEach(trainer => {
-                const marker = L.marker(trainer.coordinates, { icon: trainerIcon })
-                    .addTo(map)
-                    .bindPopup(`
-                        <div style="min-width: 200px;">
-                            <h3 style="margin: 0 0 5px 0; color: #1e293b;">${trainer.name}</h3>
-                            <p style="margin: 0 0 5px 0; color: #64748b;">${trainer.location}</p>
-                            <p style="margin: 0 0 5px 0; color: #3b82f6; font-weight: 500;">${trainer.specialty}</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                                <span style="color: #10b981; font-weight: bold;">${trainer.rate}€/tunti</span>
-                                <span style="color: #f59e0b;">
-                                    <i class="fas fa-star"></i> ${trainer.rating}
-                                </span>
-                            </div>
-                            <button onclick="viewTrainerProfile(${trainer.id})" style="width: 100%; margin-top: 10px; padding: 8px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                                Näytä Profiili
-                            </button>
-                        </div>
-                    `);
-                
-                markers.push({
-                    trainer: trainer,
-                    marker: marker
-                });
-            });
-
-            // Populate trainer list
-            const trainerList = document.getElementById('trainer-list');
-            trainers.forEach(trainer => {
-                const item = document.createElement('div');
-                item.className = 'trainer-map-item';
-                item.innerHTML = `
-                    <div class="trainer-avatar">${trainer.initials}</div>
-                    <div class="trainer-map-info">
-                        <div class="trainer-map-name">${trainer.name}</div>
-                        <div class="trainer-map-location">${trainer.location}</div>
-                        <div class="trainer-map-specialty">${trainer.specialty}</div>
-                    </div>
-                `;
-                
-                item.addEventListener('click', () => {
-                    // Remove active class from all items
-                    document.querySelectorAll('.trainer-map-item').forEach(el => {
-                        el.classList.remove('active');
-                    });
-                    
-                    // Add active class to clicked item
-                    item.classList.add('active');
-                    
-                    // Find and open the corresponding marker popup
-                    const markerData = markers.find(m => m.trainer.id === trainer.id);
-                    if (markerData) {
-                        map.setView(markerData.trainer.coordinates, 14);
-                        markerData.marker.openPopup();
-                    }
-                });
-                
-                trainerList.appendChild(item);
-            });
-
-            return map;
-        }
-
-        // View trainer profile function
-        function viewTrainerProfile(trainerId) {
-            const trainer = trainers.find(t => t.id === trainerId);
-            if (trainer) {
-                alert(`Tämä siirtäisi ${trainer.name}n profiilisivulle todellisessa sovelluksessa.`);
-            }
-        }
-
-        // Simple JavaScript for interactive elements
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize the map
-            initMap();
-
-            // Add click event to all "View Profile" buttons
-            const viewProfileButtons = document.querySelectorAll('.btn-primary');
-            viewProfileButtons.forEach(button => {
-                if (button.textContent === 'Näytä Profiili') {
-                    button.addEventListener('click', function() {
-                        alert('Tämä siirtäisi valmentajan profiilisivulle todellisessa sovelluksessa.');
-                    });
-                }
-            });
-
-            // Add click event to "Find a Trainer" buttons
-            const findTrainerButtons = document.querySelectorAll('.btn-secondary');
-            findTrainerButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    // Scroll to map section
-                    document.querySelector('.map-section').scrollIntoView({ 
-                        behavior: 'smooth' 
-                    });
-                });
-            });
-
-            // Add hover effect to trainer cards
-            const trainerCards = document.querySelectorAll('.trainer-card');
-            trainerCards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-5px)';
-                    this.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.1)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.05)';
-                });
-            });
-        });
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>

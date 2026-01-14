@@ -1,0 +1,78 @@
+-- Users table (clients and trainers)
+CREATE TABLE Users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    user_type ENUM('client', 'trainer') DEFAULT 'client',
+    full_name VARCHAR(100),
+    phone VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Trainers table (extends Users)
+CREATE TABLE Trainers (
+    id INT PRIMARY KEY,
+    bio TEXT,
+    specialties TEXT,
+    certifications TEXT,
+    hourly_rate DECIMAL(8,2),
+    experience_years INT,
+    location VARCHAR(100),
+    profile_image_url VARCHAR(255),
+    rating DECIMAL(3,2) DEFAULT 0.00,
+    review_count INT DEFAULT 0,
+    FOREIGN KEY (id) REFERENCES Users(id)
+);
+
+-- Availability table
+CREATE TABLE Availability (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    trainer_id INT NOT NULL,
+    date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    is_booked BOOLEAN DEFAULT FALSE,
+    client_id INT,
+    FOREIGN KEY (trainer_id) REFERENCES Trainers(id),
+    FOREIGN KEY (client_id) REFERENCES Users(id)
+);
+
+-- Bookings table
+CREATE TABLE Bookings (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    trainer_id INT NOT NULL,
+    client_id INT NOT NULL,
+    booking_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    status ENUM('pending', 'confirmed', 'cancelled', 'completed') DEFAULT 'pending',
+    total_price DECIMAL(8,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (trainer_id) REFERENCES Trainers(id),
+    FOREIGN KEY (client_id) REFERENCES Users(id)
+);
+
+-- Reviews table
+CREATE TABLE Reviews (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    trainer_id INT NOT NULL,
+    client_id INT NOT NULL,
+    booking_id INT NOT NULL,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (trainer_id) REFERENCES Trainers(id),
+    FOREIGN KEY (client_id) REFERENCES Users(id),
+    FOREIGN KEY (booking_id) REFERENCES Bookings(id)
+);
+
+-- Sample data
+INSERT INTO Users (username, email, password_hash, user_type, full_name, phone) VALUES
+('mika_virtanen', 'mika@fitconnect.fi', 'hashed_password', 'trainer', 'Mika Virtanen', '+358401234567'),
+('emma_korhonen', 'emma@fitconnect.fi', 'hashed_password', 'trainer', 'Emma Korhonen', '+358401234568'),
+('client_anna', 'anna@email.com', 'hashed_password', 'client', 'Anna Mäkinen', '+358401234569');
+
+INSERT INTO Trainers (id, bio, specialties, certifications, hourly_rate, experience_years, location) VALUES
+(1, 'Kokenut voimailuvalmentaja 8 vuoden kokemuksella', 'Voimaharjoittelu,Kehonrakennus,Ravitsemus', 'NASM Certified, Personal Trainer', 65.00, 8, 'Kallio, Helsinki'),
+(2, 'Joogaohjaaja ja meditaatio-opettaja', 'Jooga,Meditaatio,Venyttely', 'RYT 500, Mindfulness Instructor', 55.00, 6, 'Eira, Helsinki');
